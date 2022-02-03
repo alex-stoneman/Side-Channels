@@ -3,10 +3,11 @@ import argparse
 
 # 0x values are Hexadecimal
 #
-N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+# N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
 # Public exponent:
+N = 0x81cb
 e = 0x10001
-d = "???..."
+d = 0x101000
 
 
 def parse_args():
@@ -70,17 +71,20 @@ def main():
             exit()
 
         m = pow_mod(c, priv_exp, modulus)
-        print("Done")
+        print(f"Done: {m}")
+        print(c)
+        print(priv_exp)
+        print(modulus)
 
 
 def pow_mod(x, d, N):
     m = 1
-
-    i = d.bit_length() - 1
+    print(f"d = {d}")
+    i = len(str(bin(d))) - 1
     while i >= 0:
         m = m * m
         m = m % N
-        if get_bit(d, i) == 1:
+        if d >> i == 1:
             m = multiply(m, x)
             m = m % N
         i = i - 1
@@ -89,14 +93,13 @@ def pow_mod(x, d, N):
 
 
 def multiply(a, b):
-    if get_bit(a,0) == 0:
+    if get_bit(a, 0) == 0:
         # I've got a great idea for a quicker way to multiply
         # when this is true! I haven't actually timed it, but I'm
         # sure it'll be loads better!
         return my_better_multiply(a,b)
     else:
         return a*b
-
 
 def get_bit(x, i):
     return (x >> i) & 1

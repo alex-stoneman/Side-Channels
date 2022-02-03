@@ -122,46 +122,48 @@ def password_timing():
 
 
 def rsa_timing():
-    
+    N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+    interact("1")
+    d = 1
+    try:
+        for x in range(10):
+            lesser = int(N ** (1 / (d * 2 + 1)))
+            greater = int(N ** (1 / (d * 2)))
+            YAverage = 0
+            ZAverage = 0
+            for x in range(100):
+                Y = random.randint(1, lesser - 1)
+                try:
+                    Z = random.randint(lesser + 1, greater - 1)
+                except ValueError:
+                    Z = (lesser + greater) / 2
+                count = 1
+                for value in [Y, Z]:
+                    first = time.perf_counter_ns()
+                    interact(str(value))
+                    second = time.perf_counter_ns()
+                    diff = (second - first) / (10 ** 6)
+                    if count == 1:
+                        YAverage += diff
+                        count += 1
+                    else:
+                        ZAverage += diff
+            #print(YAverage)
+            #print(ZAverage)
+            if abs(YAverage / ZAverage) < 10:
+                d *= 2
+            else:
+                d = d * 2 + 1
+            print(d)
+            print(bin(d))
+
+    except ValueError:
+        print(f"Values = {lesser, greater}")
+        print(f"X, Y = {Y, Z}")
 
 
-    pass
-    '''
-    d = 0b1
-    N = 0x5720f845a23034a6da3a27682a4f2d87ed9f82fbfa11278fb3da9b10da97121f
-    while True:
-
-        difference = False
-        for x in range(3):
-            yMax = math.floor(N ** (1 / (d * 2 + 1)))
-            y = random.randint(3, yMax)
-            zMin = yMax + 1
-            zMax = math.ceil(N ** (1 / (d * 2)))
-            z = random.randint(zMin, zMax)
-            print(y, z, "\n")
-            first = time.perf_counter_ns()
-            print(interact(str(y)))
-            second = time.perf_counter_ns()
-            test1 = (second - first) / (10 ** 9)
-            first = time.perf_counter_ns()
-            print(interact(str(z)))
-            second = time.perf_counter_ns()
-            test2 = (second - first) / (10 ** 9)
-            print(test1, "\n", test2)
-            if test1 > test2 + 0.0005:
-                difference = True
-        if difference:
-            d = d*2 + 1
-        else:
-            d = d * 2
-        print(bin(d))
-
-
-
-        time.sleep(2)
-    '''
-
-
+    print(f"Finished {x}")
+rsa_timing()
 
 
 

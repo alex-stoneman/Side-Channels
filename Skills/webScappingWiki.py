@@ -19,8 +19,6 @@ def find_links(link):
              #   print(string[:24])
         except TypeError:
             pass
-        if len(linkStrings) == 20:
-            break
     return linkStrings
 
 
@@ -30,13 +28,17 @@ def search(myList):
             item[1]= search(item[1])
         else:
             item[1] = find_links(item[0])
+        for link in item[1]:
+            if link == toFind:
+                print(f"----------\n{item}\n-----------")
     return  myList
 
 
 linkList = [[first, []]]
-for x in range(2):
+for x in range(4):
     first = time.perf_counter_ns()
     linkList = search(linkList)
+    print()
     for item in linkList[0][1]:
         print(item)
     second = time.perf_counter_ns()
