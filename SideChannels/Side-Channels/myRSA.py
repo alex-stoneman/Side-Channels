@@ -77,14 +77,14 @@ def main():
 
 def encrypt(text):
     primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
-    #p = random.choices(primes)[0]
-    #primes.remove(p)
-    #q = random.choices(primes)[0]
-    #N = p * q
-    N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-    #e, d = inverse_modulus(p, q)
-    e = 0b10001
-    d = 0b101000
+    p = random.choices(primes)[0]
+    primes.remove(p)
+    q = random.choices(primes)[0]
+    N = p * q
+    #N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+    e, d = inverse_modulus(p, q)
+    #e = 0b10001
+    #d = 0b101000
     listText = []
     encrypted = ""
     for letter in text:
@@ -124,6 +124,6 @@ def proper_decrypt():
 # 0b10100000
 
 
-#encrypt(input("Message = "))
-#decrypt(int(input("CypherText ="), 16))
-proper_decrypt()
+# encrypt(input("Message = "))
+# decrypt(input("CypherText ="))
+# proper_decrypt()

@@ -1,9 +1,9 @@
 import subprocess, time, math, random
-
+from myRSA import square_and_multiply
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make
 # p global or If I wanted to pass it thorough as a parameter like in errorMsg
 chars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-problem = "password-timing"
+problem = "rsa-timing"
 exe = f"./{problem}/oracle.windows"
 p = subprocess.Popen(exe, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
@@ -121,10 +121,15 @@ def password_timing():
         password_timing()
 
 
-def rsa_timing():
+def rsa_timing_real():
     N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
     interact("1")
     d = 1
+    lesser = 0
+    greater = 0
+    x = 0
+    Y = 0
+    Z = 0
     try:
         for x in range(10):
             lesser = int(N ** (1 / (d * 2 + 1)))
@@ -159,13 +164,30 @@ def rsa_timing():
 
     except ValueError:
         print(f"Values = {lesser, greater}")
-        print(f"X, Y = {Y, Z}")
-
+        print(f"Y, Z = {Y, Z}")
 
     print(f"Finished {x}")
-rsa_timing()
 
 
-
-
+def rsa_timing_false():
+    private = 0
+    count = 1
+    times = [[0, 0], [0, 0]]
+    N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+    for x in range(10):
+        number = random.randint(1, 10000)
+        enter = str(hex(number))[2:]
+        first = time.perf_counter_ns()
+        idk = interact(enter)
+        second = time.perf_counter_ns()
+        diff = (second - first) / (10 ** 9)
+        if number % 2 == 0:
+            times[0][0] += diff
+            times[0][1] += 1
+        else:
+            times[1][0] += diff
+            times[1][1] += 1
+    print(times[0][0] / times[0][1])
+    print(times[1][0] / times[1][1])
+rsa_timing_false()
 

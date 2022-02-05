@@ -3,9 +3,9 @@ import argparse
 
 # 0x values are Hexadecimal
 #
-# N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-# Public exponent:
-N = 0x81cb
+N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+#Public exponent:
+
 e = 0x10001
 d = 0x101000
 
@@ -84,7 +84,7 @@ def pow_mod(x, d, N):
     while i >= 0:
         m = m * m
         m = m % N
-        if d >> i == 1:
+        if get_bit(d, i) == 1:
             m = multiply(m, x)
             m = m % N
         i = i - 1
@@ -102,6 +102,12 @@ def multiply(a, b):
         return a*b
 
 def get_bit(x, i):
+    # Bit shift by i and then & does a bit wise comparison with 1
+    # e.g. x = 18 = 0b10010, i = 3
+    # x >> i = 0b10
+    # 0b10 & 1 = 2(1 and 0) + (0 and 1) = 0
+    # or in other words the second bit is a 1
+    # doing return int(str(x)[-i]) more efficiently
     return (x >> i) & 1
 
 
