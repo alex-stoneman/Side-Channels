@@ -1,5 +1,6 @@
 import subprocess, time, math, random
 from myRSA import square_and_multiply
+from myRSA import square_and_multiply
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make
 # p global or If I wanted to pass it thorough as a parameter like in errorMsg
 chars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -121,6 +122,14 @@ def password_timing():
         password_timing()
 
 
+def time_test(test):
+    first = time.perf_counter_ns()
+    interact(str(test))
+    second = time.perf_counter_ns()
+    diff = (second - first) / (10 ** 9)
+    return round(diff, 5)
+
+
 def rsa_timing_real():
     N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
     interact("1")
@@ -170,24 +179,69 @@ def rsa_timing_real():
 
 
 def rsa_timing_false():
-    private = 0
-    count = 1
-    times = [[0, 0], [0, 0]]
-    N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-    for x in range(10):
-        number = random.randint(1, 10000)
-        enter = str(hex(number))[2:]
-        first = time.perf_counter_ns()
-        idk = interact(enter)
-        second = time.perf_counter_ns()
-        diff = (second - first) / (10 ** 9)
-        if number % 2 == 0:
-            times[0][0] += diff
-            times[0][1] += 1
-        else:
-            times[1][0] += diff
-            times[1][1] += 1
-    print(times[0][0] / times[0][1])
-    print(times[1][0] / times[1][1])
-rsa_timing_false()
+    private = 1
+    while True:
+        times = [[0, 0], [0, 0]]
+        N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+        for x in range(10):
+            number = random.randint(1, 10000)
+            enter = str(hex(number))[2:]
+            difference = time_test(enter)
+            if square_and_multiply(number, private, N) % 2 == 0:
+                times[0][0] += difference
+                times[0][1] += 1
+            else:
+                times[1][0] += difference
+                times[1][1] += 1
+        even = times[0][0] / times[0][1]
+        odd = times[1][0] / times[1][1]
 
+        private *= 2
+        if even > odd + 0.05:
+            private += 1
+        print(bin(private))
+
+
+def rsa_timing_test():
+    tests = 5
+    timingTracker = {
+        "Very Small": [],
+        "Small": [],
+        "Medium": [],
+        "Large": [],
+        "Very Large": []
+    }
+    interact("10")
+    for prime in [2, 5, 7, 17]:
+        for x in range(2,10):
+            total = 0
+            number = prime * 2 ** x
+            enter = str(hex(number))[2:]
+            print(enter, end=": ")
+            for average in range(tests):
+                difference = time_test(enter)
+                total += difference
+            average = round(total / tests, 5)
+            print(average)
+            if average <= 1:
+                timingTracker["Very Small"].append(x)
+            elif 1 < average <= 1.2:
+                timingTracker["Small"].append(x)
+            elif 1.2 < average <= 1.265:
+                timingTracker["Medium"].append(x)
+            elif 1.265 < average <= 1.3:
+                timingTracker["Large"].append(x)
+            else:
+                timingTracker["Very Large"].append(x)
+    for item in timingTracker:
+        print(item, ":", timingTracker[item])
+
+
+rsa_timing_test()
+'''
+Very Small : [99]
+Small : [2, 3, 11, 29, 30, 33, 37, 43, 44, 45, 49, 52, 53, 55, 59, 60, 61, 67, 71, 73, 78, 79, 85, 91]
+Medium : [4, 7, 9, 13, 14, 15, 20, 26, 27, 32, 35, 40, 41, 48, 51, 57, 58, 65, 66, 81, 95, 97]
+Large : [6, 17, 21, 25, 34, 46, 69, 87, 88, 93, 94]
+Very Large : [5, 8, 10, 12, 16, 18, 19, 22, 23, 24, 28, 31, 36, 38, 39, 42, 47, 50, 54, 56, 62, 63, 64, 68, 70, 72, 74, 75, 76, 77, 80, 82, 83, 84, 86, 89, 90, 92, 96, 98]
+'''
