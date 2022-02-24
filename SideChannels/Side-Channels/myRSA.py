@@ -3,8 +3,8 @@ import time
 
 
 def square_and_multiply(num, e, N):
-    operations = str(bin(e))[3:]
-    mod_value = num % N
+    operations = str(bin(e))[2:]
+    mod_value = 1
     for op in operations:
         if op == "1":
             mod_value = (mod_value ** 2) * num
@@ -93,17 +93,19 @@ def encrypt(text):
         encryptedMessage = square_and_multiply(message, e, N)
         encrypted += chr(encryptedMessage)
     print(encrypted)
-    print(f"Public Key = {N}, {e}")
-    print(f"Private Key = {d}")
+    print(f"Public Key = {hex(N)}, {bin(e)}")
+    print(f"Private Key = {bin(d)}")
+    return encrypted, d, N
 
 
-def decrypt(text):
-    d = int(input("Private key = "), 16)
-    N = int(input("Public key Mod = "))
+def decrypt(text, d, N):
     listText = []
     decrypted = ""
     for letter in text:
         listText.append(ord(letter))
+    for message in listText:
+        decryptedMessage = square_and_multiply(message, d, N)
+        decrypted += chr(decryptedMessage)
     print(decrypted)
 
 
@@ -123,19 +125,20 @@ def proper_decrypt():
 # 101000
 # 0b10100000
 
+#m, d, N = encrypt(input("Message = "))
+#decrypt(m, d, N)
 
-# encrypt(input("Message = "))
-# decrypt(input("CypherText ="))
 # proper_decrypt()
-def main():
-    N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-    test = 1
-    final = 66
-    # possible = 100110000001001010010000000011000001100000000110000010000100001010001111111100000010000
-    time.sleep(2)
-    while final != 65:
-        new = square_and_multiply(65, 17, N)
-        final = square_and_multiply(new, test, N)
-        test += 1
-        print(bin(test))
 
+N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+e = 0x10001
+message = 65
+encrypted = square_and_multiply(message, e, N)
+
+def please_work(d):
+    decrypted = square_and_multiply(encrypted, d, N)
+    if decrypted == 65:
+        print(d)
+        return True
+    else:
+        return False

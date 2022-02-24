@@ -1,6 +1,7 @@
 import subprocess, time, math, random
 from myRSA import square_and_multiply
 from myRSA import square_and_multiply
+from myRSA import please_work
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make
 # p global or If I wanted to pass it thorough as a parameter like in errorMsg
 chars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -183,8 +184,8 @@ def rsa_timing_false():
     while True:
         times = [[0, 0], [0, 0]]
         N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-        for x in range(10):
-            number = random.randint(1, 10000)
+        for x in range(100):
+            number = random.randint(1, 10000000)
             enter = str(hex(number))[2:]
             difference = time_test(enter)
             if square_and_multiply(number, private, N) % 2 == 0:
@@ -200,6 +201,8 @@ def rsa_timing_false():
         if even > odd + 0.05:
             private += 1
         print(bin(private))
+        if please_work(private):
+            break
 
 
 def rsa_timing_test():
@@ -237,7 +240,8 @@ def rsa_timing_test():
         print(item, ":", timingTracker[item])
 
 
-rsa_timing_test()
+rsa_timing_false()
+
 '''
 Very Small : [99]
 Small : [2, 3, 11, 29, 30, 33, 37, 43, 44, 45, 49, 52, 53, 55, 59, 60, 61, 67, 71, 73, 78, 79, 85, 91]
