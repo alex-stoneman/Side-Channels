@@ -8,7 +8,9 @@ N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
 
 e = 0x10001
 d = 0x101000
-
+print(N)
+print(len(str(N)))
+print(len(bin(N * 40)))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='')

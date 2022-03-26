@@ -18,7 +18,7 @@ while True:
     elif option == "4":
         timingAttack.password_timing()
     elif option == "5":
-        timingAttack.rsa_timing()
+        timingAttack.rsa_timing_false()
     else:
         problem = "oh no"
 

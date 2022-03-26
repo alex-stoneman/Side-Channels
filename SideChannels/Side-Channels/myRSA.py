@@ -2,15 +2,58 @@ import random
 import time
 
 
-def square_and_multiply(num, e, N):
+def my_square_and_multiply(num, e, N):
     operations = str(bin(e))[2:]
     mod_value = 1
     for op in operations:
         if op == "1":
+
             mod_value = (mod_value ** 2) * num
         else:
             mod_value **= 2
         if mod_value >= N:
+            mod_value %= N
+    return mod_value
+
+
+def actual_square_and_multiply(num, e, N):
+    operations = str(bin(e))[2:]
+    mod_value = 1
+    for op in operations:
+        mod_value = mod_value ** 2
+        mod_value %= N
+        if op == "1":
+            mod_value *= num
+            mod_value %= N
+    return mod_value
+
+
+
+def counting_square_and_multiply(num, e, N):
+    operations = str(bin(e))[2:]
+    mod_value = 1
+    count = 0
+    for op in operations:
+        mod_value = mod_value ** 2
+        mod_value %= N
+        if op == "1":
+            if mod_value % 2 == 0:
+                count += 1
+            mod_value *= num
+            mod_value %= N
+    return count, mod_value
+
+
+def timing_square_and_multiply(num, e, N):
+    operations = str(bin(e))[2:]
+    mod_value = 1
+    for op in operations:
+        mod_value = mod_value ** 2
+        mod_value %= N
+        if op == "1":
+            if mod_value % 2 == 0:
+                time.sleep(0.05)
+            mod_value *= num
             mod_value %= N
     return mod_value
 
@@ -90,7 +133,7 @@ def encrypt(text):
     for letter in text:
         listText.append(ord(letter))
     for message in listText:
-        encryptedMessage = square_and_multiply(message, e, N)
+        encryptedMessage = actual_square_and_multiply(message, e, N)
         encrypted += chr(encryptedMessage)
     print(encrypted)
     print(f"Public Key = {hex(N)}, {bin(e)}")
@@ -104,21 +147,20 @@ def decrypt(text, d, N):
     for letter in text:
         listText.append(ord(letter))
     for message in listText:
-        decryptedMessage = square_and_multiply(message, d, N)
+        decryptedMessage = my_square_and_multiply(message, d, N)
         decrypted += chr(decryptedMessage)
     print(decrypted)
 
 
 def proper_decrypt():
-    message = 0x4b73d755b10edcc3187779b905aec7a102b82e13ab084de7fed826698524e097
-    publicKey = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-    private = int(input("Private: "), 2)
-    private = 1052672
+    publicKey = 0x81cb
+    private = 0x34d9
+    e = 0x11
+    message = my_square_and_multiply(65, e, publicKey)
     print(private)
-    decryptedMessage = square_and_multiply(message, private, publicKey)
-    print(decryptedMessage)
-    print(publicKey)
-    print(chr(decryptedMessage))
+    decryptedMessage = my_square_and_multiply(message, private, publicKey)
+
+
 
 # 0x4b73d755b10edcc3187779b905aec7a102b82e13ab084de7fed826698524e097
 # 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
@@ -133,12 +175,26 @@ def proper_decrypt():
 N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
 e = 0x10001
 message = 65
-encrypted = square_and_multiply(message, e, N)
+encrypted = my_square_and_multiply(message, e, N)
 
 def please_work(d):
-    decrypted = square_and_multiply(encrypted, d, N)
+    decrypted = my_square_and_multiply(encrypted, d, N)
     if decrypted == 65:
         print(d)
         return True
     else:
         return False
+
+
+def get_external_values():
+    primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+    p = random.choices(primes)[0]
+    primes.remove(p)
+    q = random.choices(primes)[0]
+    N = p * q
+    e, d = inverse_modulus(p, q)
+    print(f"Correct: {bin(d)}")
+    return N, d
+
+
+# proper_decrypt()

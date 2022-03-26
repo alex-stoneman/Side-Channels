@@ -15,8 +15,6 @@ def find_links(link):
         try:
             if string[:24] == "https://en.wikipedia.org":
                 linkStrings.append([string,[]])
-            #else:
-             #   print(string[:24])
         except TypeError:
             pass
     return linkStrings

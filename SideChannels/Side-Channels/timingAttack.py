@@ -1,7 +1,8 @@
 import subprocess, time, math, random
 from myRSA import square_and_multiply
 from myRSA import square_and_multiply
-from myRSA import please_work
+import myRSA
+
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make
 # p global or If I wanted to pass it thorough as a parameter like in errorMsg
 chars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -17,7 +18,7 @@ def interact(password):
         p.stdin.flush()
         return p.stdout.readline().decode().strip()
     except OSError:
-        pass
+        print("BAD")
 
 
 # test out a password 3 times and take the average in order to ensure the result is reliable
@@ -123,9 +124,10 @@ def password_timing():
         password_timing()
 
 
-def time_test(test):
+def time_test(test, N, d):
     first = time.perf_counter_ns()
-    interact(str(test))
+    # interact(str(test))
+    myRSA.find_time(test, d, N)
     second = time.perf_counter_ns()
     diff = (second - first) / (10 ** 9)
     return round(diff, 5)
@@ -181,28 +183,101 @@ def rsa_timing_real():
 
 def rsa_timing_false():
     private = 1
+    N, d = myRSA.get_external_values()
+    noTests = 200
     while True:
-        times = [[0, 0], [0, 0]]
-        N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-        for x in range(100):
-            number = random.randint(1, 10000000)
-            enter = str(hex(number))[2:]
-            difference = time_test(enter)
-            if square_and_multiply(number, private, N) % 2 == 0:
-                times[0][0] += difference
-                times[0][1] += 1
-            else:
-                times[1][0] += difference
-                times[1][1] += 1
-        even = times[0][0] / times[0][1]
-        odd = times[1][0] / times[1][1]
+        times = [0, 0]
+        # N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+        for wanted in range(2):
+            for x in range(noTests):
+                while True:
+                    number = random.randint(1, 100000000)
+                    if square_and_multiply(number, private, N) % 2 == wanted:
+                        #enter = str(hex(number))[2:]
+                        enter = number
+                        testTime = time_test(enter, N, d)
+                        if testTime < 0.6:
+                            times[wanted] += testTime
+                            break
+        even = times[0] / noTests
+        odd = times[1] / noTests
 
         private *= 2
-        if even > odd + 0.05:
+        print(even, odd)
+        if even > odd + 0.028:
             private += 1
+        elif even > odd + 0.02 or odd > even + 0.018:
+            private //= 2
         print(bin(private))
-        if please_work(private):
+        if private == d:
             break
+
+
+def rsa_timing_grouped():
+    private = 1
+    # N, d = myRSA.get_external_values()
+    N = 0x81cb
+    d = 0x34d9
+    noTests = 50
+    while True:
+        binaryPrivate = str(bin(private))[2:]
+        times = {}
+        for wanted in range(len(binaryPrivate) - 4, len(binaryPrivate)):
+            if wanted >= 0:
+                times[wanted] = [[], []]
+                for parity in range(2):
+                    repetitions = 0
+                    while len(times[wanted][parity]) < noTests and repetitions < 10000:
+                        count = 0
+                        number = random.randint(1000, 10000000)
+                        for index in range(len(binaryPrivate) - 1):
+                            value = int(binaryPrivate[:index + 1])
+                            evenOrOdd = square_and_multiply(number, value, N)
+                            # print(number, evenOrOdd)
+                            if evenOrOdd % 2 == 0:
+                                count += 1
+                        if count == wanted:
+                            testTime = time_test(number, N, d)
+                            if square_and_multiply(number, private, N) % 2 == parity:
+                                times[count][parity].append(testTime)
+                        else:
+                            repetitions += 1
+                    print(repetitions)
+        print(times)
+        diff = []
+        collectedDiff = []
+        for lists in times:
+            collectedDiff.append(0)
+            for x in range(len(times[lists])):
+                item = times[lists][x]
+                print(item)
+                collectedDiff[-1] += sum(item)
+                new = round(sum(item) / len(item), 4)
+                times[lists][x] = new
+            collectedDiff[-1] /= (2 * noTests)
+            diff.append(times[lists][0] - times[lists][1])
+            if diff[-1] < 0:
+                diff[-1] = 0
+        print(bin(d))
+        print(times)
+        print(f"diff = {diff}")
+        print(f"Collected diff = {collectedDiff}")
+        total = 0
+        changed = False
+        for item in diff:
+            if item > 0.05:
+                private = private * 2 + 1
+                changed = True
+                break
+            total += item
+        if total / len(diff) > 0.03 and not changed:
+            private = private * 2 + 1
+            changed = True
+        if not changed:
+            private = private * 2
+        print(bin(private))
+
+
 
 
 def rsa_timing_test():
@@ -240,7 +315,7 @@ def rsa_timing_test():
         print(item, ":", timingTracker[item])
 
 
-rsa_timing_false()
+# rsa_timing_false()
 
 '''
 Very Small : [99]
@@ -249,3 +324,24 @@ Medium : [4, 7, 9, 13, 14, 15, 20, 26, 27, 32, 35, 40, 41, 48, 51, 57, 58, 65, 6
 Large : [6, 17, 21, 25, 34, 46, 69, 87, 88, 93, 94]
 Very Large : [5, 8, 10, 12, 16, 18, 19, 22, 23, 24, 28, 31, 36, 38, 39, 42, 47, 50, 54, 56, 62, 63, 64, 68, 70, 72, 74, 75, 76, 77, 80, 82, 83, 84, 86, 89, 90, 92, 96, 98]
 '''
+
+def many_tests():
+    N, d = myRSA.get_external_values()
+    largest = 0
+    smallest = 10
+    average = 0
+    for x in range(10000):
+        test = random.randint(1, 1000000)
+        time = round(time_test(test, N, d), 3)
+        if time > largest:
+            largest = time
+        if time < smallest:
+            smallest = time
+        average += time
+        print(average / (x + 1))
+    print(smallest)
+    print(largest)
+
+# many_tests()
+# rsa_timing_false()
+rsa_timing_grouped()
