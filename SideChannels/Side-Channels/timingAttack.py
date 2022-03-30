@@ -1,6 +1,4 @@
 import subprocess, time, math, random
-from myRSA import square_and_multiply
-from myRSA import square_and_multiply
 import myRSA
 
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make

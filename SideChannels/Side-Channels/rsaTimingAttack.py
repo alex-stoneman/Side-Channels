@@ -96,6 +96,8 @@ def attack():
     print(private)
 
 
+def test_the_water():
+    pass
 
 
 attack()
