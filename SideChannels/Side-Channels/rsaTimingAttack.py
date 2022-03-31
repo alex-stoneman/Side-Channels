@@ -31,17 +31,20 @@ def count_test(test, d, N):
     return myRSA.counting_square_and_multiply(test, d, N)
 
 
+# Successful for 32 bit primes using 80 tests
+# Gonna test 128 bit primes using 200 tests
 def attack():
+    totalTimeStart = time.perf_counter_ns()
     private = 1
-    N =  0xf32c0b00906a9bab
+    N = 0xf32c0b00906a9bab
     e = 0x10001
     d = 0x6ddafcd08ff9b621
     print(bin(d))
     expectedTimeDifference = 0.01
     encrypted = myRSA.actual_square_and_multiply(65, e, N)
-    repeatedZeroLimit = 7
-    maxLength = len(str(bin(N)))+ + 13
-    noTests = 50
+    repeatedZeroLimit = int(len(bin(N)) // 8.5)
+    maxLength = len(str(bin(N))) + 20
+    noTests = 200
     repeat = 0
     reallyRepeat = 0
     # even, odd - longer, shorter
@@ -72,9 +75,11 @@ def attack():
         time.sleep(1)
         if shorter + 10 * expectedTimeDifference > longer > shorter + expectedTimeDifference:
             private = private * 2 + 1
-            if repeat > 0:
+            if repeat > 1:
                 repeat -= 2
-        elif longer < shorter + (2 / 5) * expectedTimeDifference or abs(longer - shorter) > 1:
+            elif repeat == 1:
+                repeat = 0
+        elif longer < shorter + (3 / 5) * expectedTimeDifference or abs(longer - shorter) > 25 * expectedTimeDifference:
             private *= 2
             repeat += 1
         else:
@@ -83,9 +88,7 @@ def attack():
                 private //= 2
                 reallyRepeat = 0
         if repeat > repeatedZeroLimit:
-            while private % 2 == 0:
-                private //= 2
-            for x in range(6):
+            for x in range(repeatedZeroLimit + 6):
                 private //= 2
             repeat //= 3
             if private == 0:
@@ -100,6 +103,8 @@ def attack():
         print()
 
     print(bin(private))
+    totalTimeFinish = time.perf_counter_ns()
+    print(f"{(totalTimeFinish - totalTimeStart) // (10 ** 9)}s")
 
 
 def test_the_water():
