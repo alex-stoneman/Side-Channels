@@ -33,27 +33,33 @@ def count_test(test, d, N):
 
 def attack():
     private = 1
-    N = 0xae9da269
-    e = 0x11
-    d = 0x522b4911
-
-    encrypted = myRSA.actual_square_and_multiply(65, e, N)
-
+    N =  0xf32c0b00906a9bab
+    e = 0x10001
+    d = 0x6ddafcd08ff9b621
     print(bin(d))
+    expectedTimeDifference = 0.01
+    encrypted = myRSA.actual_square_and_multiply(65, e, N)
+    repeatedZeroLimit = 7
     maxLength = len(str(bin(N)))+ + 13
-    noTests = 30
+    noTests = 50
     repeat = 0
     reallyRepeat = 0
     # even, odd - longer, shorter
     while myRSA.actual_square_and_multiply(encrypted, private, N) != 65:
         times = [[0, 0], [0, 0]]
+        if myRSA.actual_square_and_multiply(encrypted, 2 * private + 1, N) == 65:
+            print(private * 2 + 1)
+            break
+        elif myRSA.actual_square_and_multiply(encrypted, 2 * private, N) == 65:
+            print(private * 2)
+            break
         while True:
             value = random.randint(1, 10000000000)
             previous, expected = count_test(value, private, N)
             expected = (expected ** 2) % N
             parity = expected % 2
             if times[parity][1] < noTests:
-                times[parity][0] += time_test(value, d, N) - previous * 0.01
+                times[parity][0] += time_test(value, d, N) - previous * expectedTimeDifference
                 times[parity][1] += 1
             elif parity == 0:
                 if times[1][1] == noTests:
@@ -64,11 +70,11 @@ def attack():
         shorter = times[1][0] / noTests
         print(longer - shorter)
         time.sleep(1)
-        if longer > shorter + 0.05:
+        if shorter + 10 * expectedTimeDifference > longer > shorter + expectedTimeDifference:
             private = private * 2 + 1
             if repeat > 0:
                 repeat -= 2
-        elif longer < shorter + 0.02:
+        elif longer < shorter + (2 / 5) * expectedTimeDifference or abs(longer - shorter) > 1:
             private *= 2
             repeat += 1
         else:
@@ -76,10 +82,10 @@ def attack():
             if reallyRepeat > 4:
                 private //= 2
                 reallyRepeat = 0
-        if repeat > 6:
+        if repeat > repeatedZeroLimit:
             while private % 2 == 0:
                 private //= 2
-            for x in range(3):
+            for x in range(6):
                 private //= 2
             repeat //= 3
             if private == 0:
@@ -93,7 +99,7 @@ def attack():
         print(repeat)
         print()
 
-    print(private)
+    print(bin(private))
 
 
 def test_the_water():

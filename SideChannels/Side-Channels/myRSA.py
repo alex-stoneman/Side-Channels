@@ -52,7 +52,7 @@ def timing_square_and_multiply(num, e, N):
         mod_value %= N
         if op == "1":
             if mod_value % 2 == 0:
-                time.sleep(0.05)
+                time.sleep(0.01)
             mod_value *= num
             mod_value %= N
     return mod_value
