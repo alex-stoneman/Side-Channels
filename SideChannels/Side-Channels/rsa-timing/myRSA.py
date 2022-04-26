@@ -19,6 +19,7 @@ def my_square_and_multiply(num, e, N):
 def actual_square_and_multiply(num, e, N):
     operations = str(bin(e))[2:]
     mod_value = 1
+    # print(num)
     for op in operations:
         mod_value = mod_value ** 2
         mod_value %= N
@@ -152,38 +153,30 @@ def decrypt(text, d, N):
     print(decrypted)
 
 
+def hex_to_string(hexString):
+    letters = ""
+    currentAscii = ""
+    for character in hexString:
+        currentAscii += character
+        if int(currentAscii, 16) > 128:
+            #print(currentAscii)
+            #print(currentAscii[:-1])
+            letters += chr(int(currentAscii[:-1], 16))
+            currentAscii = character
+    letters += chr(int(currentAscii, 16))
+    print(letters, end="")
+
+
 def proper_decrypt():
-    publicKey = 0x81cb
-    private = 0x34d9
-    e = 0x11
-    message = my_square_and_multiply(65, e, publicKey)
-    print(private)
-    decryptedMessage = my_square_and_multiply(message, private, publicKey)
-
-
-
-# 0x4b73d755b10edcc3187779b905aec7a102b82e13ab084de7fed826698524e097
-# 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-# 101000
-# 0b10100000
-
-#m, d, N = encrypt(input("Message = "))
-#decrypt(m, d, N)
-
-# proper_decrypt()
-
-N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
-e = 0x10001
-message = 65
-encrypted = my_square_and_multiply(message, e, N)
-
-def please_work(d):
-    decrypted = my_square_and_multiply(encrypted, d, N)
-    if decrypted == 65:
-        print(d)
-        return True
-    else:
-        return False
+    publicKey = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
+    private = 0x5ebe0cb89de05030eaa8ea8ffc64f1b608e959a8d800222ea9c1e4c3febad71
+    file = open("ciphertext.txt", "r")
+    hiddenMessage = ""
+    for line in file:
+        message = int(line, 16)
+        decryptedMessage = actual_square_and_multiply(message, private, publicKey)
+        hiddenMessage = ""
+        hex_to_string(str(hex(decryptedMessage))[2:])
 
 
 def get_external_values():
@@ -197,4 +190,4 @@ def get_external_values():
     return N, d
 
 
-# proper_decrypt()
+proper_decrypt()

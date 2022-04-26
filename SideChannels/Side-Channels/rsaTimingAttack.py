@@ -152,7 +152,6 @@ def practice_attack():
         longer = times[0][0] / noTests
         shorter = times[1][0] / noTests
         print(longer - shorter)
-        time.sleep(1)
         if 4 * expectedTimeDifference > longer - shorter > expectedTimeDifference:
             private = private * 2 + 1
             if repeat > 1:
@@ -234,7 +233,6 @@ def attack():
         longer = times[0][0] / noTests
         shorter = times[1][0] / noTests
         print(longer - shorter)
-        time.sleep(1)
         if shorter + 10 * expectedTimeDifference > longer > shorter + expectedTimeDifference:
             private = private * 2 + 1
             if repeat > 1:

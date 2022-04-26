@@ -1,4 +1,4 @@
-import subprocess, time, math, random
+import subprocess, time, random
 import myRSA
 
 # At the moment the challenge is set manually because I wasn't sure if I wanted to make
