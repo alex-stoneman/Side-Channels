@@ -1,0 +1,17 @@
+Run pillow.bat
+
+This will install pillow a version of PIL (python image library) in the directory in your area.
+
+To use python in your program you need to tell it to look in this folder for additional packages, before importing pygame.
+
+Use this code at the top of your python program.
+
+##################
+
+import sys
+if "M:/Python Packages" not in sys.path:
+    sys.path.append("M:/Python Packages")
+
+import PIL
+
+##################

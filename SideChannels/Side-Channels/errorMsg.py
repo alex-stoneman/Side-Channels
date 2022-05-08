@@ -2,6 +2,12 @@ import subprocess
 chars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 problem = ["pin-four-digit", "pin-err-msg", "password-err-msg"]
 
+# test out a password and return the error message
+def interact(password, p):
+    p.stdin.write(password.encode() + b'\n')
+    p.stdin.flush()
+    return p.stdout.readline().decode().strip()
+
 
 # Find the integer index in the error message and return it
 def find_number(text):
@@ -14,16 +20,6 @@ def find_number(text):
         return int(final)
     else:
         return "no"
-
-
-# test out a password and return the error message, ignore OS errors bc they were annoying
-def interact(password, p):
-    try:
-        p.stdin.write(password.encode() + b'\n')
-        p.stdin.flush()
-        return p.stdout.readline().decode().strip()
-    except OSError:
-        pass
 
 
 # Keep incrementing the password length by 1 until it is correct then return this length
@@ -44,37 +40,41 @@ def find_password_length(p):
 def find_pin(length, p):
     test = "0" * length
     while interact(test, p)[0] == "F":
-        wrong = find_number(interact(test, p))
-        test = test[:wrong] + str(int(test[wrong]) + 1) + test[wrong + 1:]
+        wrongIndex = find_number(interact(test, p))
+        test = test[:wrongIndex] + str(int(test[wrongIndex]) + 1) + test[wrongIndex + 1:]
     return test
 
 
 # For password of a known length change each character in the password in turn ... you get the idea
-# Same as the pin but with letters
+# Same as the pin but with letters instead of digits
 def find_password(length, p):
     test = "a" * length
     error = "F"
     while error == "F":
-        wrong = find_number(interact(test, p))
+        wrongIndex = find_number(interact(test, p))
         current = 0
-        while wrong == find_number(interact(test, p)):
-            test = test[:wrong] + chars[current] + test[wrong + 1:]
+        while wrongIndex == find_number(interact(test, p)):
+            test = test[:wrongIndex] + chars[current] + test[wrongIndex + 1:]
             current += 1
             error = interact(test, p)[0]
 
     return test
 
 
-# When this function is called from the main file it is passed which challenge it is doing
-# Open the appropriate file and then the appropriate functions
+# When this function is called it is passed which challenge it is doing
+# Open the appropriate file and then run the appropriate functions
 def run(option):
     exe = f"./{problem[int(option) - 1]}/oracle.windows"
     p = subprocess.Popen(exe, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     if option == "1":
+        # The length is already know so this doesn't need to be found
         print(find_pin(4, p))
     else:
+        # both problems require the length to be found first
         length = find_password_length(p)
         if option == "2":
             print(find_pin(length, p))
         else:
             print(find_password(length, p))
+
+run(input(": "))

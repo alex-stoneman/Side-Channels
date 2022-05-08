@@ -1,0 +1,30 @@
+8 bit primes
+------------
+N = 0x81cb
+e = 0x11
+d = 0x34d9
+
+16 bit primes
+-------------
+N = 0xae9da269
+e = 0x11
+d = 0x522b4911
+
+32 bit primes
+-------------
+N = 0xf32c0b00906a9bab
+e = 0x10001
+d = 0x6ddafcd08ff9b621
+
+64 bit primes
+-------------
+N = 0xce147b31d8f218c76723f430f18ae1a9
+e = 0x10001
+d = 0x2819341f6ee72c8ac6bcbdc258089341
+
+128 bit primes
+--------------
+N = 0x5720f845a23034a6da3a27682a4f2d87ed9f82fbfa11278fb3da9b10da97121f
+e = 0x10001
+d = 0x2ae1610ef439815034cab6263fdc63ed94efebfad88a889e35dc8b0ebca18e21
+

@@ -19,7 +19,6 @@ def my_square_and_multiply(num, e, N):
 def actual_square_and_multiply(num, e, N):
     operations = str(bin(e))[2:]
     mod_value = 1
-    # print(num)
     for op in operations:
         mod_value = mod_value ** 2
         mod_value %= N
@@ -95,29 +94,6 @@ def inverse_modulus(p, q):
             return e, d
 
 
-def main():
-    plain = input(": ")
-    plainList = []
-    for character in plain:
-        plainList.append(ord(character))
-    print(plainList)
-    N = 0xf32c0b00906a9bab
-    e = 0x10001
-    d = 0x6ddafcd08ff9b621
-
-    encrypted = []
-    for item in plainList:
-        newVal = (item ** e) % N
-        encrypted.append(newVal)
-    print(encrypted)
-
-    final = []
-    for item in encrypted:
-        newVal = (item ** d) % N
-        final.append(newVal)
-
-    print(final)
-
 
 def encrypt(text):
     primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
@@ -125,10 +101,7 @@ def encrypt(text):
     primes.remove(p)
     q = random.choices(primes)[0]
     N = p * q
-    #N = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
     e, d = inverse_modulus(p, q)
-    #e = 0b10001
-    #d = 0b101000
     listText = []
     encrypted = ""
     for letter in text:
@@ -159,15 +132,13 @@ def hex_to_string(hexString):
     for character in hexString:
         currentAscii += character
         if int(currentAscii, 16) > 128:
-            #print(currentAscii)
-            #print(currentAscii[:-1])
             letters += chr(int(currentAscii[:-1], 16))
             currentAscii = character
     letters += chr(int(currentAscii, 16))
     print(letters, end="")
 
 
-def proper_decrypt():
+def decrypt_file():
     publicKey = 0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07
     private = 0x5ebe0cb89de05030eaa8ea8ffc64f1b608e959a8d800222ea9c1e4c3febad71
     file = open("ciphertext.txt", "r")
@@ -190,4 +161,6 @@ def get_external_values():
     return N, d
 
 
-proper_decrypt()
+# decrypt_file()
+# hex_to_string("35CE2753B0D8D653B52D56A855782017")
+print(len(str(bin(0x778db34bc38db694dfcaca7e60cb124711b5bc4db5f64808a544f82bc8b36c07))) - 2)
